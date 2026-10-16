@@ -1,0 +1,24 @@
+{
+  "name": "directorio-contactos-azure-sql",
+  "version": "1.0.0",
+  "description": "Plantilla educativa: Directorio de Contactos para integración con Azure SQL desplegable en Vercel",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "node api/index.js"
+  },
+  "keywords": [
+    "azure-sql",
+    "vercel",
+    "node",
+    "express",
+    "crud",
+    "educativo"
+  ],
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mssql": "^10.0.2"
+  }
+}

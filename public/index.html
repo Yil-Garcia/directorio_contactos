@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Directorio de Contactos | Laboratorio Azure SQL</title>
+  <style>
+    /* ==========================================================================
+       ESTILOS CSS PURO (MINIMALISTA Y MODERNO)
+       ========================================================================== */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --secondary: #64748b;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --warning-bg: #fef3c7;
+      --warning-text: #92400e;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Encabezado */
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Badge de estado educativo */
+    .edu-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--warning-bg);
+      color: var(--warning-text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      margin-top: 0.75rem;
+      border: 1px solid #fde68a;
+    }
+
+    /* Tarjetas */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Mensajes de feedback */
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .alert-success {
+      background-color: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .alert-error {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    /* Formulario */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-group input {
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    /* Botones */
+    .btn {
+      padding: 0.6rem 1.25rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: #ffffff;
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger-hover);
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.8rem;
+    }
+
+    /* Tabla */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid var(--border);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .col-id {
+      width: 60px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .col-actions {
+      width: 160px;
+      text-align: right;
+    }
+
+    .actions-group {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Footer educativo */
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Encabezado Principal -->
+    <header>
+      <h1>Directorio de Contactos</h1>
+      <p>Plantilla educativa para integración de Base de Datos en la Nube (Azure SQL)</p>
+      <div class="edu-badge" id="modoBadge">
+        <span>🔄 Verificando conexión con Azure SQL...</span>
+      </div>
+    </header>
+
+    <!-- Contenedor de Alertas / Notificaciones -->
+    <div id="alertBox" class="alert"></div>
+
+    <!-- Tarjeta: Formulario de Contacto -->
+    <section class="card">
+      <h2 id="formTitle">➕ Agregar Nuevo Contacto</h2>
+      <form id="contactoForm">
+        <!-- Input oculto para rastrear el ID al editar -->
+        <input type="hidden" id="contactoId" value="">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nombre">Nombre Completo *</label>
+            <input type="text" id="nombre" placeholder="ej. Ana García" required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="email">Correo Electrónico *</label>
+            <input type="email" id="email" placeholder="ej. ana@universidad.edu" required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="telefono">Teléfono *</label>
+            <input type="tel" id="telefono" placeholder="ej. +52 55 1234 5678" required autocomplete="off">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="btnCancelar" class="btn btn-secondary" style="display: none;">Cancelar</button>
+          <button type="submit" id="btnGuardar" class="btn btn-primary">Guardar Contacto</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Tarjeta: Tabla de Contactos -->
+    <section class="card">
+      <h2>📋 Lista de Contactos Registrados</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th class="col-actions">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaContactosBody">
+            <tr>
+              <td colspan="5" class="empty-state">Cargando contactos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Pie de página educativo -->
+    <footer>
+      <p>Práctica de Ingeniería de Software | Desplegado en Vercel &middot; Conexión a Azure SQL Database</p>
+    </footer>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT DEL CLIENTE (CONSUMO DE LA API REST)
+       ========================================================================== -->
+  <script>
+    const API_URL = '/api/contactos';
+
+    // Elementos del DOM
+    const form = document.getElementById('contactoForm');
+    const inputId = document.getElementById('contactoId');
+    const inputNombre = document.getElementById('nombre');
+    const inputEmail = document.getElementById('email');
+    const inputTelefono = document.getElementById('telefono');
+    const btnGuardar = document.getElementById('btnGuardar');
+    const btnCancelar = document.getElementById('btnCancelar');
+    const formTitle = document.getElementById('formTitle');
+    const tablaBody = document.getElementById('tablaContactosBody');
+    const alertBox = document.getElementById('alertBox');
+
+    // Estado local de edición
+    let editandoId = null;
+
+    /**
+     * Mostrar notificación en pantalla
+     */
+    function mostrarAlerta(mensaje, tipo = 'success') {
+      alertBox.textContent = mensaje;
+      alertBox.className = `alert alert-${tipo}`;
+      alertBox.style.display = 'block';
+      setTimeout(() => {
+        alertBox.style.display = 'none';
+      }, 4000);
+    }
+
+    /**
+     * 1. GET - Obtener y renderizar la lista de contactos
+     */
+    async function cargarContactos() {
+      try {
+        const respuesta = await fetch(API_URL);
+        const data = await respuesta.json();
+
+        if (!respuesta.ok) {
+          throw new Error(data.error || 'Error al consultar el servidor');
+        }
+
+        renderizarTabla(data);
+      } catch (error) {
+        console.error('Error al cargar contactos:', error);
+        tablaBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state" style="color: var(--danger); line-height: 1.6;">
+              ⚠️ <strong>Error de conexión con la Base de Datos:</strong><br>
+              <small>${escaparHTML(error.message)}</small>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    /**
+     * Renderizar las filas de la tabla
+     */
+    function renderizarTabla(contactos) {
+      if (!contactos || contactos.length === 0) {
+        tablaBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">No hay contactos registrados todavía. ¡Agrega el primero arriba!</td>
+          </tr>
+        `;
+        return;
+      }
+
+      window.contactosActuales = contactos;
+      tablaBody.innerHTML = contactos.map(c => `
+        <tr>
+          <td class="col-id">#${c.id}</td>
+          <td><strong>${escaparHTML(c.nombre)}</strong></td>
+          <td>${escaparHTML(c.email)}</td>
+          <td>${escaparHTML(c.telefono)}</td>
+          <td class="col-actions">
+            <div class="actions-group">
+              <button class="btn btn-secondary btn-sm" onclick="iniciarEdicion(${c.id})">Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="eliminarContacto(${c.id})">Eliminar</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    /**
+     * 2. POST / PUT - Guardar (Crear o Actualizar) contacto
+     */
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        nombre: inputNombre.value.trim(),
+        email: inputEmail.value.trim(),
+        telefono: inputTelefono.value.trim()
+      };
+
+      try {
+        let respuesta;
+        if (editandoId) {
+          // Operación PUT (Actualizar)
+          respuesta = await fetch(`${API_URL}/${editandoId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          // Operación POST (Crear)
+          respuesta = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+
+        if (!respuesta.ok) {
+          const errData = await respuesta.json();
+          throw new Error(errData.error || 'Error al procesar la solicitud');
+        }
+
+        mostrarAlerta(editandoId ? '✅ Contacto actualizado correctamente' : '✅ Contacto agregado con éxito', 'success');
+        resetearFormulario();
+        cargarContactos();
+      } catch (error) {
+        console.error('Error al guardar contacto:', error);
+        mostrarAlerta(`❌ Error: ${error.message}`, 'error');
+      }
+    });
+
+    /**
+     * Preparar el formulario para modo edición
+     */
+    function iniciarEdicion(id) {
+      const contacto = (window.contactosActuales || []).find(c => c.id === id);
+      if (!contacto) return;
+
+      editandoId = id;
+      inputId.value = id;
+      inputNombre.value = contacto.nombre;
+      inputEmail.value = contacto.email;
+      inputTelefono.value = contacto.telefono;
+
+      formTitle.textContent = `✏️ Editando Contacto #${id}`;
+      btnGuardar.textContent = 'Actualizar Contacto';
+      btnCancelar.style.display = 'inline-flex';
+
+      // Scroll suave hacia el formulario
+      form.scrollIntoView({ behavior: 'smooth' });
+      inputNombre.focus();
+    }
+
+    /**
+     * Cancelar edición y volver a modo creación
+     */
+    function resetearFormulario() {
+      editandoId = null;
+      inputId.value = '';
+      form.reset();
+      formTitle.textContent = '➕ Agregar Nuevo Contacto';
+      btnGuardar.textContent = 'Guardar Contacto';
+      btnCancelar.style.display = 'none';
+    }
+
+    btnCancelar.addEventListener('click', resetearFormulario);
+
+    /**
+     * 3. DELETE - Eliminar contacto
+     */
+    async function eliminarContacto(id) {
+      const confirmar = confirm(`¿Estás seguro de eliminar el contacto #${id}?`);
+      if (!confirmar) return;
+
+      try {
+        const respuesta = await fetch(`${API_URL}/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (!respuesta.ok) {
+          const errData = await respuesta.json();
+          throw new Error(errData.error || 'Error al eliminar');
+        }
+
+        mostrarAlerta('🗑️ Contacto eliminado correctamente', 'success');
+        if (editandoId === id) resetearFormulario();
+        cargarContactos();
+      } catch (error) {
+        console.error('Error al eliminar contacto:', error);
+        mostrarAlerta(`❌ Error: ${error.message}`, 'error');
+      }
+    }
+
+    /**
+     * Funciones auxiliares para prevenir XSS en frontend
+     */
+    function escaparHTML(texto) {
+      const div = document.createElement('div');
+      div.textContent = texto || '';
+      return div.innerHTML;
+    }
+
+    function escaparParam(texto) {
+      return (texto || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    /**
+     * Verificar estado de salud y conexión con Azure SQL
+     */
+    async function verificarEstadoBD() {
+      const badge = document.getElementById('modoBadge');
+      if (!badge) return;
+
+      try {
+        const res = await fetch('/api/health');
+        const data = await res.json();
+
+        if (res.ok && data.status === 'conectado') {
+          badge.style.backgroundColor = '#dcfce7';
+          badge.style.color = '#166534';
+          badge.style.borderColor = '#86efac';
+          badge.innerHTML = `<span>☁️ Conectado a Azure SQL (${escaparHTML(data.baseDatos)})</span>`;
+        } else if (data.status === 'variables_faltantes') {
+          badge.style.backgroundColor = '#fef3c7';
+          badge.style.color = '#92400e';
+          badge.style.borderColor = '#fde68a';
+          badge.innerHTML = `<span>⚠️ Faltan variables en .env o Vercel</span>`;
+        } else {
+          badge.style.backgroundColor = '#fee2e2';
+          badge.style.color = '#991b1b';
+          badge.style.borderColor = '#fca5a5';
+          badge.innerHTML = `<span>❌ Error de conexión Azure SQL (Revisar Firewall)</span>`;
+        }
+      } catch (err) {
+        badge.style.backgroundColor = '#fee2e2';
+        badge.style.color = '#991b1b';
+        badge.style.borderColor = '#fca5a5';
+        badge.innerHTML = `<span>⚠️ No se pudo verificar la API</span>`;
+      }
+    }
+
+    // Inicializar cargando contactos y verificando estado de conexión
+    document.addEventListener('DOMContentLoaded', () => {
+      verificarEstadoBD();
+      cargarContactos();
+    });
+  </script>
+</body>
+</html>
